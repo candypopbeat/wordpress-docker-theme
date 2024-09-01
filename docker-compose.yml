@@ -1,0 +1,40 @@
+services:
+
+  db:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: pass_root
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      TZ: 'Asia/Tokyo'
+
+  web:
+    build: ./config
+    depends_on:
+      - db
+    ports:
+      - 2000:80
+      # - 3000:3000 # Vite
+    volumes:
+      - html_data:/var/www/html
+      - ./themes:/var/www/html/wp-content/themes
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    depends_on:
+      - db
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOSTS=db
+      - PMA_USER=root
+      - PMA_PASSWORD=wp_pass_root
+      - TZ=Asia/Tokyo
+    ports:
+      - 9000:80
+
+volumes:
+  db_data:
+  html_data:
